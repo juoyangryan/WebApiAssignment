@@ -6,10 +6,12 @@ using System.Net.Http;
 using System.Web.Http;
 using WebApiAssignment.DAL;
 using WebApiAssignment.Models;
+using WebApiAssignment.CustomFilters;
 
 namespace WebApiAssignment.Controllers
 {
-    [Authorize]
+    [CustomExceptionFilter]
+    [Authorize(Roles = "Admin")]
     public class ValuesController : ApiController
     {
         private UserContext _userContext = new UserContext();

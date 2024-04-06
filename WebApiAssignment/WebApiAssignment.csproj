@@ -188,6 +188,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
+    <Compile Include="CustomFilters\CustomException.cs" />
     <Compile Include="DAL\DbInitializer.cs" />
     <Compile Include="DAL\UserContext.cs" />
     <Compile Include="Global.asax.cs">
