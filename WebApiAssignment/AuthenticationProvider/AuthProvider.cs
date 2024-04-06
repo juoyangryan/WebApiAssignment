@@ -5,11 +5,13 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
+using WebApiAssignment.DAL;
 
 namespace WebApiAssignment.AuthenticationProvider
 {
     public class AuthProvider : OAuthAuthorizationServerProvider
     {
+        private UserContext _userContext = new UserContext();
         public override async Task ValidateClientAuthentication(OAuthValidateClientAuthenticationContext context)
         {
             context.Validated();
@@ -18,12 +20,12 @@ namespace WebApiAssignment.AuthenticationProvider
         public override async Task GrantResourceOwnerCredentials(OAuthGrantResourceOwnerCredentialsContext context)
         {
             var identity = new ClaimsIdentity(context.Options.AuthenticationType);
-            if ((context.UserName == "Abc@gmail.com" && context.Password == "123456789"
-           ))
+            var foundUser = _userContext.Users.FirstOrDefault(user => user.UserName == context.UserName && user.Password == context.Password);
+            if (foundUser != null)
             {
 
                 identity.AddClaim(new Claim("username", context.UserName));
-                identity.AddClaim(new Claim(ClaimTypes.Role, "Admin"));
+                identity.AddClaim(new Claim(ClaimTypes.Role, foundUser.Role));
                 context.Validated(identity);
             }
             else
