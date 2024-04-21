@@ -1,17 +1,18 @@
-﻿using Microsoft.Owin.Security.OAuth;
+﻿using DomainLayer.Interfaces;
+using Microsoft.Owin.Security.OAuth;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
-using WebApiAssignment.DAL;
 
 namespace WebApiAssignment.AuthenticationProvider
 {
     public class AuthProvider : OAuthAuthorizationServerProvider
     {
-        private UserContext _userContext = new UserContext();
+        private readonly IUserService _userService;
+        public AuthProvider(IUserService userService) { _userService = userService; }
         public override async Task ValidateClientAuthentication(OAuthValidateClientAuthenticationContext context)
         {
             context.Validated();
@@ -20,12 +21,11 @@ namespace WebApiAssignment.AuthenticationProvider
         public override async Task GrantResourceOwnerCredentials(OAuthGrantResourceOwnerCredentialsContext context)
         {
             var identity = new ClaimsIdentity(context.Options.AuthenticationType);
-            var foundUser = _userContext.Users.FirstOrDefault(user => user.UserName == context.UserName && user.Password == context.Password);
-            if (foundUser != null)
+            var foundUser = await _userService.GetUserAsync(context.UserName);
+            if (foundUser != null && foundUser.Password == context.Password)
             {
 
                 identity.AddClaim(new Claim("username", context.UserName));
-                identity.AddClaim(new Claim(ClaimTypes.Role, foundUser.Role));
                 context.Validated(identity);
             }
             else
